@@ -3,6 +3,22 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const Ticket = require("../models/ticketModel");
 
+// @desc    Get all tickets
+// @route   GET /api/tickets
+// @access  Private
+const getAllTickets = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(401);
+    throw new Error("User not found");
+  }
+
+  const tickets = await Ticket.find();
+
+  res.status(200).json(tickets);
+});
+
 // @desc    Get user tickets
 // @route   GET /api/tickets
 // @access  Private
@@ -39,11 +55,6 @@ const getTicket = asyncHandler(async (req, res) => {
     throw new Error("Ticket not found");
   }
 
-  if (ticket.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("Not Authorized");
-  }
-
   res.status(200).json(ticket);
 });
 
@@ -69,6 +80,7 @@ const createTicket = asyncHandler(async (req, res) => {
     project,
     description,
     user: req.user.id,
+    name: user.name,
     status: "new",
   });
 
@@ -143,4 +155,5 @@ module.exports = {
   createTicket,
   deleteTicket,
   updateTicket,
+  getAllTickets,
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   getTickets,
+  getAllTickets,
   createTicket,
   getTicket,
   deleteTicket,
@@ -15,6 +16,8 @@ const noteRouter = require("./noteRoutes");
 router.use("/:ticketId/notes", noteRouter);
 
 router.route("/").get(protect, getTickets).post(protect, createTicket);
+
+router.route("/allTickets").get(protect, getAllTickets);
 
 router
   .route("/:id")
