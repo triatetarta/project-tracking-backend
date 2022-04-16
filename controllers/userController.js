@@ -62,6 +62,10 @@ const loginUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      jobTitle: user.jobTitle,
+      department: user.department,
+      organization: user.organization,
+      location: user.location,
       token: generateToken(user._id),
     });
   } else {
@@ -70,16 +74,30 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get current user
-// @route   /api/users/account
-// @access  Private
-const getAccount = asyncHandler(async (req, res) => {
-  const user = {
-    id: req.user._id,
-    email: req.user.email,
-    name: req.user.name,
-  };
-  res.status(200).json(user);
+// Update user details
+const updateUser = asyncHandler(async (req, res) => {
+  // Get user using the id in the JWT
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(401);
+    throw new Error("User not found");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+
+  res.status(200).json({
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    jobTitle: updatedUser.jobTitle,
+    department: updatedUser.department,
+    organization: updatedUser.organization,
+    location: updatedUser.location,
+    token: generateToken(user._id),
+  });
 });
 
 const generateToken = (id) => {
@@ -91,5 +109,5 @@ const generateToken = (id) => {
 module.exports = {
   registerUser,
   loginUser,
-  getAccount,
+  updateUser,
 };

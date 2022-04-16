@@ -73,6 +73,33 @@ const deleteComment = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
+// @desc    Delete all ticket comments
+// @route   POST /api/tickets/:ticketId/comments
+// @access  Private
+const deleteAllTicketComments = asyncHandler(async (req, res) => {
+  // Get user using the id in the JWT
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(401);
+    throw new Error("User not found");
+  }
+
+  const comments = await Comment.find({
+    ticket: req.params.ticketId,
+  });
+
+  if (!comments) {
+    res.status(401);
+    throw new Error("Comments not found");
+  }
+
+  await comments.forEach((comment) => {
+    comment.remove();
+  });
+  res.status(200).json({ ticket: req.params.ticketId });
+});
+
 // @desc    Update ticket comment
 // @route   PUT /api/tickets/:id/comments/:commentId
 // @access  Private
@@ -111,4 +138,5 @@ module.exports = {
   addComment,
   deleteComment,
   updateComment,
+  deleteAllTicketComments,
 };

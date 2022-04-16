@@ -16,6 +16,11 @@ const getAllTickets = asyncHandler(async (req, res) => {
 
   const tickets = await Ticket.find();
 
+  if (!tickets) {
+    res.status(401);
+    throw new Error("No tickets found");
+  }
+
   res.status(200).json(tickets);
 });
 
@@ -32,6 +37,11 @@ const getTickets = asyncHandler(async (req, res) => {
   }
 
   const tickets = await Ticket.find({ user: req.user.id });
+
+  if (!tickets) {
+    res.status(401);
+    throw new Error("No tickets found");
+  }
 
   res.status(200).json(tickets);
 });

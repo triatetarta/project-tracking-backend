@@ -15,6 +15,26 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, "Please add a password"],
     },
+    jobTitle: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    department: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    organization: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    location: {
+      type: String,
+      required: false,
+      default: "",
+    },
     isAdmin: {
       type: Boolean,
       required: true,
