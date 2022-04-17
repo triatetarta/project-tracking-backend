@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 // @desc    Register a new user
-// @route   /api/users
+// @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -49,7 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 // @desc    Login a user
-// @route   /api/users/login
+// @route   POST /api/users/login
 // @access  Public
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -74,7 +74,9 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-// Update user details
+// @desc    Update a user's details
+// @route   PUT /api/users/:id
+// @access  Private
 const updateUser = asyncHandler(async (req, res) => {
   // Get user using the id in the JWT
   const user = await User.findById(req.user.id);
@@ -100,6 +102,46 @@ const updateUser = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Get all users
+// @route   GET /api/users/all
+// @access  Private
+const getAllUsers = asyncHandler(async (req, res) => {
+  // Get user using the id in the JWT
+  const user = await User.findById(req.user.id);
+
+  if (!user) {
+    res.status(401);
+    throw new Error("User not found");
+  }
+
+  const users = await User.find();
+
+  if (!users) {
+    res.status(401);
+    throw new Error("No users found");
+  }
+
+  let filteredUsers;
+
+  if (users) {
+    const mappedUsers = users.map((user) => {
+      return {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        jobTitle: user.jobTitle,
+        department: user.department,
+        organization: user.organization,
+        location: user.location,
+      };
+    });
+
+    filteredUsers = mappedUsers;
+  }
+
+  res.status(200).json(filteredUsers);
+});
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
@@ -110,4 +152,5 @@ module.exports = {
   registerUser,
   loginUser,
   updateUser,
+  getAllUsers,
 };
